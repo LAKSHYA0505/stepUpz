@@ -1,5 +1,8 @@
 name: stepupz
 
+##########################################################
+####### product specific service starts ##################
+##########################################################
 services:
   product-service:
     build: ./product
@@ -7,23 +10,91 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/stepupz_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://step-upz-product-db:5432/stepupz_product_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
-      - database
+      - step-upz-product-db
+      - stepupz-discovery-service
+    networks:
+      - step-upz-network
 
-  database:
+  step-upz-product-db:
     image: postgres:16-alpine
-    container_name: stepupz-database
+    container_name: stepupz-product-database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: stepupz_db
+      POSTGRES_DB: stepupz_product_db
     ports:
-      - "5432:5432"
+      - "5440:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data   # <-- persists DB files
+      - product-db-data:/var/lib/postgresql/data   # <-- persists DB files
+    networks:
+      - step-upz-network
 
+  ##########################################################
+  ####### product specific service ens ##################
+  ##########################################################
+
+
+  ##########################################################
+  ####### user specific service starts #####################
+  ##########################################################
+
+  user-auth-service:
+    build: ./user-service
+    container_name: user-auth-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://step-upz-users-db:5432/stepupz_users_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - step-upz-users-db
+      - stepupz-discovery-service
+    networks:
+      - step-upz-network
+
+  step-upz-users-db:
+    image: postgres:16-alpine
+    container_name: stepupz-users-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stepupz_users_db
+    ports:
+      - "5441:5432"
+    volumes:
+      - users-db-data:/var/lib/postgresql/data   # <-- persists DB files
+    networks:
+      - step-upz-network
+
+##########################################################
+####### user specific service ends #######################
+##########################################################
+
+
+##########################################################
+####### discovery specific service starts ################
+##########################################################
+
+  stepupz-discovery-service:
+    build: ./service-discovery
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - step-upz-network
+
+##########################################################
+####### discovery specific service starts ################
+##########################################################
 volumes:
-  db-data:  # named volume; in Docker Desktop it will appear as stepupz_db-data
+  product-db-data:  # named volume; in Docker Desktop it will appear as stepupz_db-data
+  users-db-data:
+
+networks:
+  step-upz-network:
+    driver: bridge

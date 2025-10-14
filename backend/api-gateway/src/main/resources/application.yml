@@ -1,0 +1,37 @@
+server:
+  port : 8081
+
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: local
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+          routes:
+            - id: user-auth-service-public-routes
+              uri: lb://user-auth-service
+              predicates:
+                - Path=/api/v1/auth/**
+
+            - id: user-service-private-routes
+              uri: lb://user-auth-service
+              predicates:
+                - Path=/api/v1/users/**
+
+            - id: product-service-public-routes
+              uri: lb://product-service
+              predicates:
+                - Path=/api/v1/products/**
+
+            - id: product-service-private-admin-routes
+              uri: lb://product-service
+              predicates:
+                - Path=/api/v1/admin/products/**
+              filters:
+                - RequireAdminRoleFilter

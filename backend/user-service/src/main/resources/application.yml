@@ -1,6 +1,6 @@
 spring:
   application:
-    name: UserAuthenticationService
+    name: user-auth-service
   profiles:
     active: local
 

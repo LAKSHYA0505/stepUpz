@@ -1,9 +1,9 @@
 name: stepupz
 
-##########################################################
-####### product specific service starts ##################
-##########################################################
 services:
+  ##########################################################
+  ####### product specific service starts ##################
+  ##########################################################
   product-service:
     build: ./product
     container_name: product-service
@@ -13,9 +13,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://step-upz-product-db:5432/stepupz_product_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
     depends_on:
       - step-upz-product-db
-      - stepupz-discovery-service
+      - discovery-service
     networks:
       - step-upz-network
 
@@ -29,19 +30,13 @@ services:
     ports:
       - "5440:5432"
     volumes:
-      - product-db-data:/var/lib/postgresql/data   # <-- persists DB files
+      - product-db-data:/var/lib/postgresql/data
     networks:
       - step-upz-network
 
   ##########################################################
-  ####### product specific service ens ##################
-  ##########################################################
-
-
-  ##########################################################
   ####### user specific service starts #####################
   ##########################################################
-
   user-auth-service:
     build: ./user-service
     container_name: user-auth-service
@@ -51,9 +46,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://step-upz-users-db:5432/stepupz_users_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
     depends_on:
       - step-upz-users-db
-      - stepupz-discovery-service
+      - discovery-service
     networks:
       - step-upz-network
 
@@ -67,20 +63,14 @@ services:
     ports:
       - "5441:5432"
     volumes:
-      - users-db-data:/var/lib/postgresql/data   # <-- persists DB files
+      - users-db-data:/var/lib/postgresql/data
     networks:
       - step-upz-network
 
-##########################################################
-####### user specific service ends #######################
-##########################################################
-
-
-##########################################################
-####### discovery specific service starts ################
-##########################################################
-
-  stepupz-discovery-service:
+  ##########################################################
+  ####### discovery specific service #######################
+  ##########################################################
+  discovery-service:
     build: ./service-discovery
     container_name: discovery-service
     ports:
@@ -88,11 +78,25 @@ services:
     networks:
       - step-upz-network
 
-##########################################################
-####### discovery specific service starts ################
-##########################################################
+  ##########################################################
+  ####### api gateway service ##############################
+  ##########################################################
+  api-gateway-service:
+    build: ./api-gateway
+    container_name: api-gateway-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+      - product-service
+      - user-auth-service
+    networks:
+      - step-upz-network
+
 volumes:
-  product-db-data:  # named volume; in Docker Desktop it will appear as stepupz_db-data
+  product-db-data:
   users-db-data:
 
 networks:

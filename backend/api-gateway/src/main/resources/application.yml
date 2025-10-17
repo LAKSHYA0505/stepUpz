@@ -1,5 +1,5 @@
 server:
-  port : 8081
+  port: 8081
 
 spring:
   application:
@@ -13,6 +13,20 @@ spring:
           discovery:
             locator:
               enabled: true
+
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "http://localhost:5173"   # frontend origin
+                allowed-methods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowed-headers: "*"
+                allow-credentials: true
+
           routes:
             - id: user-auth-service-public-routes
               uri: lb://user-auth-service

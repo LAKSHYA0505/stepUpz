@@ -1,12 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import React from 'react'
+import Navbar from '@/components/layout/Navbar';
 
 export default function Home(){
     return(
         <div>
-            <Link to="/signin">
-                <Button>Log In</Button>
-            </Link>
+            <Navbar/>
         </div>
     );
 }

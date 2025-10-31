@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: order-and-cart-management-service
+  profiles:
+    active: local
+
+server:
+  port: 8084

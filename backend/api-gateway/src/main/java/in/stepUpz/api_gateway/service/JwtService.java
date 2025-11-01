@@ -73,4 +73,13 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public String extractUserId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.get("userId", String.class);  // "userId" key from payload
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

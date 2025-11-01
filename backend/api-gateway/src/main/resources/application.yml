@@ -6,6 +6,7 @@ spring:
     name: api-gateway
   profiles:
     active: local
+
   cloud:
     gateway:
       server:
@@ -17,7 +18,7 @@ spring:
           globalcors:
             cors-configurations:
               '[/**]':
-                allowed-origins: "http://localhost:5173"   # frontend origin
+                allowed-origins: "http://localhost:5173"
                 allowed-methods:
                   - GET
                   - POST
@@ -49,3 +50,8 @@ spring:
                 - Path=/api/v1/admin/products/**
               filters:
                 - RequireAdminRoleFilter
+
+            - id: order-and-cart-management-service-routes
+              uri: lb://order-and-cart-management
+              predicates:
+                - Path=/api/v1/cart/**

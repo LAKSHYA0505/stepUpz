@@ -44,6 +44,7 @@ import java.util.function.Function;
             Map<String, Object> extraClaims = new HashMap<>();
             if (userDetails instanceof in.stepupz.user_service.model.User user) {
                 extraClaims.put("role", user.getRole().name()); // add USER / ADMIN
+                extraClaims.put("userId", user.getId()); //add userId
             }
             return generateToken(extraClaims, userDetails);
         }

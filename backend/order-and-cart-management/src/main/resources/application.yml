@@ -1,6 +1,6 @@
 spring:
   application:
-    name: order-and-cart-management-service
+    name: order-and-cart-management
   profiles:
     active: local
 

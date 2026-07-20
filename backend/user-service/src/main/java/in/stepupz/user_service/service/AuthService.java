@@ -34,6 +34,9 @@ public class AuthService {
     }
 
     public AuthResponse registerUser(SignUpRequest signUpRequest){
+        if(userRepository.findByEmail(signUpRequest.getEmail()).isPresent()){
+            throw new RuntimeException("Error: Email is already in use!");
+        }
         User user= User.builder()
                 .name(signUpRequest.getName())
                 .email(signUpRequest.getEmail())
